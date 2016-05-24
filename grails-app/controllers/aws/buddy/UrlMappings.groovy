@@ -17,5 +17,9 @@ class UrlMappings {
         "/api/tools/refresh"(controller: 'tools', action: 'refresh')
         "/api/instances/$id"(controller: 'instance', action: 'get')
         "/api/instances"(controller: 'instance', action: 'list')
+
+        "/api/users/$id"(controller: 'user', action: 'get')
+        "/api/users/me"(controller: 'user', action: 'me')
+        "/api/users/"(controller: 'user', action: [GET: 'list', POST: 'create'])
     }
 }

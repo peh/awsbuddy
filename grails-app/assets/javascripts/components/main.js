@@ -1,8 +1,11 @@
 import React from "react";
-import Navbar from "./navbar/navbar";
-import Login from "./user/login"
 import {assign} from "lodash";
+import UserService from "../services/user-service";
+import Navbar from "./navbar/navbar";
+import Login from "./user/login";
 const RouterMixin = require('react-mini-router').RouterMixin;
+const navigate = require('react-mini-router').navigate;
+
 var Main = React.createClass({
   mixins: [RouterMixin],
 
@@ -19,34 +22,43 @@ var Main = React.createClass({
   },
 
   componentWillMount() {
-    superagent.get('/api/users/validate').end((err, res)=> {
-      let loggedIn = false
-      if (!err) {
-        loggedIn = true
-      }
-      this.setState(assign(this.state, {loginVerified: true, loggedIn: loggedIn}))
-    });
+    new UserService().validate().then((json) => {
+      this.onLoginSuccess()
+    }).catch((error)=> {
+      this.onLogout()
+    })
   },
 
-  home: ()=> {
+  home: function () {
     return <div> Hallo!!!</div>
+  },
+
+  onLoginSuccess: function () {
+    this.setState(assign(this.state, {loginVerified: true, loggedIn: true}))
+    navigate('/', false)
+  },
+
+  onLogout: function () {
+    new UserService().logout()
+    this.setState(assign(this.state, {loginVerified: true, loggedIn: false}))
   },
 
   render: function () {
     if (!this.state.loginVerified) {
       return <div>Loading</div>
     } else {
-      let toRender = null
+      let renderComponent = null
       if (!this.state.loggedIn) {
-        toRender = <Login />
+        navigate('/login', false)
+        renderComponent = <Login onLogin={this.onLoginSuccess}/>
       } else {
-        toRender = this.renderCurrentRoute()
+        renderComponent = this.renderCurrentRoute()
       }
       return (
         <div>
-          <Navbar loggedIn={false}/>
+          <Navbar loggedIn={false} onLogout={this.onLogout}/>
           <div className="container">
-            {toRender}
+            {renderComponent}
           </div>
         </div>
       )

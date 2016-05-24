@@ -1,5 +1,5 @@
 import ConfigurationService from "./configuration-service";
-import RequestService from './request-service'
+import RequestService from "./request-service";
 let instance = null;
 
 export default class UserService {
@@ -13,37 +13,78 @@ export default class UserService {
     }
 
     this.currentUser = null
-    this.configurationService = ConfigurationService()
-
-    superagent.set("Authorization", `Bearer ${this.configurationService.get('accessToken')}`)
+    this.configurationService = new ConfigurationService()
+    this.requestService = new RequestService()
 
     return instance;
   }
 
-  login(username, password) {
+  logout() {
+    this.requestService.setAccessToken("invalid")
+    this.currentUser = null
+    return this.requestService.post('/api/users/logout', {}).then((resp)=> {
+      if (resp.status === 200) {
+        return resp
+      } else {
+        var error = new Error(response.statusText)
+        error.response = response
+        throw error
+      }
+    })
+  }
 
+  login(username, password) {
+    return new Promise((resolve, reject)=> {
+      this.requestService.post('/api/users/login', {username: username, password: password}).then((resp)=> {
+        if (resp.status === 200) {
+          return resp.json()
+        } else {
+          var error = new Error(response.statusText)
+          error.response = response
+          reject(error)
+        }
+      }).then((json)=> {
+        this.requestService.setAccessToken(json.access_token)
+        this.setMe()
+        resolve(json)
+      })
+    })
   }
 
   get me() {
-    return this.currentUser
+    return new Promise((resolve, reject)=> {
+      if(this.currentUser) {
+        resolve(this.currentUser)
+      } else {
+
+      }
+    })
   }
 
-  validate(cb) {
-    RequestService().get('/api/users/validate').then((resp)=>{
-      debugger
+  setMe() {
+    this.requestService.get('/api/users/me').then((resp)=> {
+      if(resp.status === 200) {
+        return resp.json()
+      } else {
+        var error = new Error(response.statusText)
+        error.response = response
+        reject(error)
+      }
+    }).then((json)=> {
+      this.currentUser = json.user
     })
+  }
 
-    // end((err, res)=> {
-    //   let loggedIn = false
-    //   if (!err) {
-    //     loggedIn = true
-    //   }
-    //   this.setState(assign(this.state, {loginVerified: true, loggedIn: loggedIn}))
-    // });
-    //
-    //
-    // if (cb) {
-    //
-    // }
+  validate() {
+    return this.requestService.get('/api/users/validate').then((resp)=> {
+      if (resp.status === 200) {
+        this.setMe()
+        return resp.json()
+      } else {
+        var error = new Error(response.statusText)
+        error.response = response
+        throw error
+      }
+    })
   }
 }

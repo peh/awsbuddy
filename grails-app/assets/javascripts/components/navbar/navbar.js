@@ -22,7 +22,7 @@ export default class Navbar extends React.Component {
               <li><a href="#contact">Contact</a></li>
             </ul>
             <ul className="nav navbar-nav navbar-right">
-              <li><a href="">Logout</a></li>
+              <li><a href="javascript: void(0)" onClick={this.props.onLogout}>Logout</a></li>
             </ul>
           </div>
         </div>

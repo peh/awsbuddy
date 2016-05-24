@@ -1,6 +1,6 @@
 import ConfigurationService from "./configuration-service";
 import {assign} from "lodash";
-import * as fetch from "whatwg-fetch";
+import "whatwg-fetch";
 
 let instance = null;
 
@@ -13,7 +13,7 @@ export default class RequestService {
       instance = this
     }
 
-    this.configurationService = ConfigurationService()
+    this.configurationService = new ConfigurationService()
 
     this.defaultHeaders = {
       'Accept': 'application/json',
@@ -30,6 +30,7 @@ export default class RequestService {
   }
 
   setAccessToken(accessToken) {
+    this.configurationService.set('accessToken', accessToken)
     this.defaultHeaders = assign(this.defaultHeaders, {"Authorization": `Bearer ${accessToken}`})
   }
 
@@ -41,18 +42,10 @@ export default class RequestService {
   }
 
   post(url, data) {
-    /***
-       fetch('/users', {
-  method: 'POST',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name: 'Hubot',
-    login: 'hubot',
-  })
-})
-     */
+    return fetch(url, {
+      method: 'POST',
+      headers: this.defaultHeaders,
+      body: JSON.stringify(data)
+    })
   }
 }

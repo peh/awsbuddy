@@ -6,8 +6,8 @@ const Main = require('./components/main.js');
 
 
 // initialize the two most important singletons before everything else!
-RequestService()
-ConfigurationService()
+new RequestService()
+new ConfigurationService()
 
 
 ReactDOM.render(<Main />, document.getElementById('app-container'));

@@ -1,6 +1,7 @@
 import React from "react";
 import {assign} from "lodash";
-import ConfigurationService from "../../services/configuration-service";
+import UserService from "../../services/user-service"
+
 export default class Login extends React.Component {
 
   constructor(props) {
@@ -11,6 +12,7 @@ export default class Login extends React.Component {
     }
     this.onInputChange = this.onInputChange.bind(this)
     this.onFormSubmit = this.onFormSubmit.bind(this)
+    this.userService = new UserService()
   }
 
   onInputChange(e) {
@@ -21,11 +23,10 @@ export default class Login extends React.Component {
 
   onFormSubmit() {
     let {username, password} = this.state
-    superagent.post("/api/users/login").send({username: username, password: password}).end((err, res) => {
-      if(!err) {
-        ConfigurationService.set('accessToken', res.body.access_token)
-        superagent.set("Authorization", `Bearer ${res.body.access_token}`)
-      }
+    this.userService.login(username, password).then(()=>{
+      this.props.onLogin()
+    }).catch((error)=>{
+
     })
   }
 
