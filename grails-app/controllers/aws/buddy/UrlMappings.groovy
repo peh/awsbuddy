@@ -13,7 +13,6 @@ class UrlMappings {
         "500"(view: '/error')
         "404"(view: '/notFound')
 
-
         "/api/tools/refresh"(controller: 'tools', action: 'refresh')
         "/api/instances/$id"(controller: 'instance', action: 'get')
         "/api/instances"(controller: 'instance', action: 'list')
@@ -21,5 +20,8 @@ class UrlMappings {
         "/api/users/$id"(controller: 'user', action: 'get')
         "/api/users/me"(controller: 'user', action: 'me')
         "/api/users/"(controller: 'user', action: [GET: 'list', POST: 'create'])
+
+        "/api/filters/$id"(controller: 'filter', action: [GET: 'get', PUT: 'edit'])
+        "/api/filters/"(controller: 'filter', action: [GET: 'list', POST: 'create'])
     }
 }

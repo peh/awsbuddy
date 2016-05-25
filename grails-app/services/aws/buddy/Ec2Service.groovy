@@ -41,9 +41,8 @@ class Ec2Service {
 
     def getCpuMetrics(Instance instance) {
         if (instance.lastMetricCheck.isBefore(DateTime.now().minusMinutes(1)) || Environment.developmentMode) {
-            // TODO cvp: make sure fromDate is less then a day as otherwise we will get errors from AWS
-            def fromDate = instance.lastMetricCheck
-            fromDate = DateTime.now().minusHours(1)
+            // go back at most 1000 minutes
+            DateTime fromDate = [instance.lastMetricCheck, DateTime.now().minusMinutes(1000)].max { it.millis }
             def req = new GetMetricStatisticsRequest().withStartTime(fromDate.toDate())
                     .withNamespace("AWS/EC2")
                     .withPeriod(60)

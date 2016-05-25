@@ -65,4 +65,20 @@ class InstanceService {
             default: log.error "$state.name cannot be parsed as Instance.State"
         }
     }
+
+    List<Instance> list(Filter filter, Map params) {
+        Instance.createCriteria().list(params) {
+            createAlias('tags', 't')
+            ['name', 'identifier'].each {
+                if (filter.getProperty(it)) {
+                    ilike(it, "%${filter.getProperty(it)}%")
+                }
+            }
+
+            filter.tags.each {
+                ilike('t.tagKey', "%$it.tagKey%")
+                ilike('t.tagValue', "%$it.tagKey%")
+            }
+        }
+    }
 }

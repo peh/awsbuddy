@@ -1,6 +1,7 @@
 package aws.buddy
 
 class InstanceController extends AbstractApiController {
+    InstanceService instanceService
 
     def get() {
         withInstance { Instance instance ->
@@ -10,7 +11,9 @@ class InstanceController extends AbstractApiController {
     }
 
     def list() {
-        renderJson(ApiResponse.getOk([instances: Instance.list(params)]))
+        Filter filter = Filter.get(params.getLong('filter')) ?: new Filter(params)
+        List instances = instanceService.list(filter, params)
+        renderJson(ApiResponse.getOk([instances: instances]))
     }
 
     void withInstance(Closure c) {
