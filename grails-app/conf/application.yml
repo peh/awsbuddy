@@ -15,6 +15,8 @@ dataSource:
 
 environments:
     development:
+        server:
+          port: 9000
         grails:
             assets:
                 babel:
