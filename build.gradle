@@ -43,6 +43,7 @@ dependencyManagement {
 }
 
 dependencies {
+
     compile "org.springframework.boot:spring-boot-starter-logging"
     compile "org.springframework.boot:spring-boot-autoconfigure"
     compile "org.grails:grails-core"
@@ -87,4 +88,10 @@ task wrapper(type: Wrapper) {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+[bootRun].each { runTask ->
+    configure(runTask) {
+        systemProperties System.properties
+    }
 }
